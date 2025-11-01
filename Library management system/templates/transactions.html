@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Transactions - Library System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Transactions Management</h2>
+    <div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#issueBookModal">
+            <i class="fas fa-book"></i> Issue Book
+        </button>
+        <button class="btn btn-info" id="viewOverdueBtn">
+            <i class="fas fa-exclamation-triangle"></i> View Overdue
+        </button>
+    </div>
+</div>
+
+<!-- Transactions Table -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Book</th>
+                        <th>Member</th>
+                        <th>Issue Date</th>
+                        <th>Due Date</th>
+                        <th>Return Date</th>
+                        <th>Fine</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                    <tr>
+                        <td>{{ transaction.id }}</td>
+                        <td>{{ transaction.book_title }}</td>
+                        <td>{{ transaction.member_name }}</td>
+                        <td>{{ transaction.issue_date }}</td>
+                        <td>{{ transaction.due_date }}</td>
+                        <td>{{ transaction.return_date or 'Not returned' }}</td>
+                        <td>${{ transaction.fine_amount }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if transaction.status == 'issued' %}bg-warning
+                                {% elif transaction.status == 'returned' %}bg-success
+                                {% else %}bg-danger{% endif %}">
+                                {{ transaction.status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if transaction.status != 'returned' %}
+                            <button class="btn btn-sm btn-success return-btn" 
+                                    data-transaction-id="{{ transaction.id }}">
+                                Return
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Issue Book Modal -->
+<div class="modal fade" id="issueBookModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Issue Book</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="issueBookForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Select Book *</label>
+                        <select class="form-control" name="book_id" required>
+                            <option value="">Select a book</option>
+                            {% for book in books %}
+                            {% if book.available_copies > 0 %}
+                            <option value="{{ book.id }}">{{ book.title }} by {{ book.author }} (Available: {{ book.available_copies }})</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Select Member *</label>
+                        <select class="form-control" name="member_id" required>
+                            <option value="">Select a member</option>
+                            {% for member in members %}
+                            {% if member.status == 'active' %}
+                            <option value="{{ member.id }}">{{ member.name }} ({{ member.email }})</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Days to Issue</label>
+                        <input type="number" class="form-control" name="days" value="14" min="1" max="30">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Issue Book</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
