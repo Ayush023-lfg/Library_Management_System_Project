@@ -1,6 +1,6 @@
 # Library Management System
 
-A web-based Library Management System developed using Python, Flask, and MySQL to simplify library operations such as book management, member management, issuing and returning books, and maintaining records..
+A web-based Library Management System developed using Python, Flask, and MySQL to simplify library operations such as book management, member management, issuing and returning books, and maintaining records.
 
 ## Features
 
